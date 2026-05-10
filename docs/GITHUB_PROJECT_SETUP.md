@@ -10,7 +10,7 @@
 
 1. 打开您的GitHub仓库主页：
    ```
-   https://github.com/您的用户名/pi-agent
+   https://github.com/yxkaze/pi-agent
    ```
 
 2. 点击顶部的 **"Projects"** 标签页
