@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 文档
+    url: https://github.com/您的用户名/pi-agent/tree/main/docs
+    about: 查看项目文档和开发指南
+  - name: 💬 讨论区
+    url: https://github.com/您的用户名/pi-agent/discussions
+    about: 参与项目讨论和提问
