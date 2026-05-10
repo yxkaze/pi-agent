@@ -1,61 +1,61 @@
-# Pi Agent Core - Product Requirements Document (PRD)
+# Pi Agent Core - 产品需求文档 (PRD)
 
-**Version:** 1.0  
-**Date:** 2025-05-10  
-**Author:** AI Agent (with user collaboration)  
-**Status:** Draft
-
----
-
-## 1. Executive Summary
-
-Pi Agent Core is a modular, extensible AI agent framework built with Go and the eino framework. The first phase focuses on LLM integration abstraction, providing a unified interface for multiple LLM providers (OpenAI, Chinese domestic models, and local models) based on the OpenAI API standard.
-
-### Key Principles
-
-- **Modularity**: Each component in its own package, single responsibility
-- **Clarity**: No god objects, no monolithic files, clear separation of concerns
-- **Extensibility**: Easy to add new providers, tools, and capabilities
-- **Go Idiomatic**: Follow Go best practices and conventions
+**版本:** 1.0  
+**日期:** 2025-05-10  
+**作者:** AI Agent (与用户协作)  
+**状态:** 草稿
 
 ---
 
-## 2. Project Scope
+## 1. 执行摘要
 
-### Phase 1: LLM Integration (Current Focus)
+Pi Agent Core 是一个基于 Go 语言和 eino 框架构建的模块化、可扩展的 AI Agent 框架。第一阶段聚焦于 LLM 集成抽象，基于 OpenAI API 标准，为多个 LLM 提供商（OpenAI、国产模型、本地模型）提供统一接口。
 
-**In Scope:**
-- Provider abstraction layer with unified interface
-- OpenAI provider implementation
-- Chinese domestic model support (Baidu Qianfan)
-- Local model support (Ollama)
-- Basic message handling and conversation management
-- Streaming response support
-- Tool calling capability
+### 核心原则
 
-**Out of Scope:**
-- Advanced agent orchestration
-- Multi-agent coordination
-- Complex workflow composition
-- Web UI / Terminal UI
-- Session persistence
-- Skills system implementation
+- **模块化**：每个组件独立成包，单一职责
+- **清晰性**：拒绝上帝对象，拒绝单文件几千行，关注点清晰分离
+- **可扩展性**：易于添加新的提供商、工具和能力
+- **Go语言惯例**：遵循 Go 最佳实践和惯例
 
 ---
 
-## 3. Architecture Overview
+## 2. 项目范围
 
-### 3.1 System Architecture
+### 第一阶段：LLM 集成（当前重点）
+
+**范围内：**
+- Provider 抽象层与统一接口
+- OpenAI Provider 实现
+- 国产模型支持（百度千帆）
+- 本地模型支持（Ollama）
+- 基础消息处理与对话管理
+- 流式响应支持
+- 工具调用能力
+
+**范围外：**
+- 高级 Agent 编排
+- 多 Agent 协调
+- 复杂工作流组合
+- Web UI / 终端 UI
+- 会话持久化
+- Skills 系统实现
+
+---
+
+## 3. 架构概览
+
+### 3.1 系统架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      Application Layer                       │
-│              (pi-coding-agent, other agents)                 │
+│                      应用层                                  │
+│              (pi-coding-agent, 其他 agents)                  │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      Pi Agent Core                           │
+│                    Pi Agent Core                             │
 │  ┌──────────────┐  ┌──────────┐  ┌─────────┐  ┌─────────┐  │
 │  │   Provider   │  │  Message │  │  Tools  │  │  Agent  │  │
 │  │   Registry   │  │  Builder │  │  System │  │  Core   │  │
@@ -64,844 +64,544 @@ Pi Agent Core is a modular, extensible AI agent framework built with Go and the 
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                     Eino Framework                           │
+│                     Eino 框架                                │
 │        BaseChatModel, ToolCallingChatModel, Schema           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Package Structure
+### 3.2 包结构
 
 ```
 pi-agent/
-├── go.mod                    # Go module definition
-├── go.sum                    # Dependency checksums
-├── README.md                 # Project documentation
-├── LICENSE                   # Apache 2.0 License
+├── go.mod                    # Go 模块定义
+├── go.sum                    # 依赖校验和
+├── README.md                 # 项目文档
+├── LICENSE                   # Apache 2.0 许可证
 │
-├── pkg/                      # Public packages
-│   ├── provider/             # LLM provider abstraction
-│   │   ├── provider.go       # Provider interface & registry
-│   │   ├── config.go         # Configuration structures
-│   │   ├── errors.go         # Provider-specific errors
-│   │   ├── openai/           # OpenAI implementation
-│   │   │   ├── provider.go
-│   │   │   ├── config.go
-│   │   │   └── provider_test.go
-│   │   ├── qianfan/          # Baidu Qianfan implementation
-│   │   │   ├── provider.go
-│   │   │   ├── config.go
-│   │   │   └── provider_test.go
-│   │   └── ollama/           # Ollama implementation
-│   │       ├── provider.go
-│   │       ├── config.go
-│   │       └── provider_test.go
+├── pkg/                      # 公共包
+│   ├── provider/             # LLM Provider 抽象
+│   │   ├── provider.go       # Provider 接口与注册中心
+│   │   ├── config.go         # 配置结构
+│   │   ├── errors.go         # Provider 特定错误
+│   │   ├── openai/           # OpenAI 实现
+│   │   ├── qianfan/          # 百度千帆实现
+│   │   └── ollama/           # Ollama 实现
 │   │
-│   ├── message/              # Message utilities
-│   │   ├── builder.go        # Fluent message builder
-│   │   ├── convert.go        # Format conversion utilities
+│   ├── message/              # 消息工具
+│   │   ├── builder.go        # 流畅的消息构建器
+│   │   ├── convert.go        # 格式转换工具
 │   │   └── builder_test.go
 │   │
-│   ├── tools/                # Tool system (Phase 2)
-│   │   ├── tool.go           # Tool interface
-│   │   ├── registry.go       # Tool registry
-│   │   └── builtin/          # Built-in tools
+│   ├── tools/                # 工具系统（第二阶段）
+│   │   ├── tool.go           # 工具接口
+│   │   ├── registry.go       # 工具注册中心
+│   │   └── builtin/          # 内置工具
 │   │
-│   └── agent/                # Agent core (Phase 2)
-│       ├── agent.go          # Agent interface
-│       ├── state.go          # State management
-│       └── executor.go       # Execution engine
+│   └── agent/                # Agent 核心（第二阶段）
+│       ├── agent.go          # Agent 接口
+│       ├── state.go          # 状态管理
+│       └── executor.go       # 执行引擎
 │
-├── internal/                 # Internal packages
-│   └── testutil/             # Testing utilities
+├── internal/                 # 内部包
+│   └── testutil/             # 测试工具
 │       └── mock.go
 │
-├── examples/                 # Usage examples
-│   ├── basic/                # Basic usage examples
-│   │   ├── main.go
-│   │   └── README.md
-│   └── streaming/            # Streaming examples
-│       ├── main.go
-│       └── README.md
+├── examples/                 # 使用示例
+│   ├── basic/                # 基础使用示例
+│   └── streaming/            # 流式示例
 │
-└── docs/                     # Documentation
-    ├── ARCHITECTURE.md       # Architecture decisions
-    ├── PROVIDER.md           # Provider development guide
-    └── examples/             # Code examples
-        └── quickstart.md
+└── docs/                     # 文档
+    ├── ARCHITECTURE.md       # 架构决策
+    └── PROVIDER.md           # Provider 开发指南
 ```
 
 ---
 
-## 4. Component Specifications
+## 4. 组件规格
 
-### 4.1 Provider Package
+### 4.1 Provider 包
 
-#### 4.1.1 Core Interface
+#### 4.1.1 核心接口设计
 
-**File:** `pkg/provider/provider.go`
+**文件：** `pkg/provider/provider.go`
 
-```go
-package provider
+Provider 接口是顶层工厂，用于创建聊天模型实例。每个 Provider 实现（OpenAI、Qianfan、Ollama）都实现此接口。
 
-import (
-    "context"
-    "github.com/cloudwego/eino/components/model"
-    "github.com/cloudwego/eino/schema"
-)
+**主要方法：**
 
-// Provider is the top-level factory for creating chat model instances.
-// Each provider implementation (OpenAI, Qianfan, Ollama) implements this interface.
-type Provider interface {
-    // Name returns the provider's unique identifier (e.g., "openai", "qianfan")
-    Name() string
-    
-    // CreateModel creates a BaseChatModel instance with the given configuration.
-    // The config parameter must be of the provider's specific Config type.
-    CreateModel(ctx context.Context, config interface{}) (model.BaseChatModel, error)
-    
-    // CreateToolCallingModel creates a ToolCallingChatModel with tool support.
-    CreateToolCallingModel(ctx context.Context, config interface{}) (model.ToolCallingChatModel, error)
-    
-    // ValidateConfig checks if the configuration is valid for this provider.
-    ValidateConfig(config interface{}) error
-    
-    // ListModels returns available models for this provider (optional, can return empty list)
-    ListModels(ctx context.Context) ([]ModelInfo, error)
-}
+- `Name()` - 返回 Provider 的唯一标识符（如 "openai"、"qianfan"）
+- `CreateModel(ctx, config)` - 创建 BaseChatModel 实例
+- `CreateToolCallingModel(ctx, config)` - 创建支持工具调用的 ToolCallingChatModel 实例
+- `ValidateConfig(config)` - 验证配置是否有效
+- `ListModels(ctx)` - 返回该 Provider 可用的模型列表
 
-// ModelInfo describes a model's capabilities and metadata
-type ModelInfo struct {
-    ID          string            // Model identifier (e.g., "gpt-4o")
-    Name        string            // Display name
-    Provider    string            // Provider name
-    MaxTokens   int               // Maximum context length
-    Capabilities []string         // ["chat", "tools", "vision", etc.]
-    Metadata    map[string]string // Additional provider-specific info
-}
+**ModelInfo 结构：**
 
-// Registry manages all registered providers
-type Registry struct {
-    providers map[string]Provider
-}
+描述模型的元数据和能力：
+- `ID` - 模型标识符（如 "gpt-4o"）
+- `Name` - 显示名称
+- `Provider` - Provider 名称
+- `MaxTokens` - 最大上下文长度
+- `Capabilities` - 能力列表（如 chat、tools、vision）
+- `Metadata` - 额外的 Provider 特定信息
 
-// NewRegistry creates a new provider registry
-func NewRegistry() *Registry
+**Registry（注册中心）：**
 
-// Register adds a provider to the registry
-func (r *Registry) Register(p Provider) error
+管理所有已注册的 Provider：
+- `NewRegistry()` - 创建新的注册中心
+- `Register(p)` - 注册 Provider
+- `Get(name)` - 按名称获取 Provider
+- `List()` - 列出所有注册的 Provider 名称
 
-// Get retrieves a provider by name
-func (r *Registry) Get(name string) (Provider, error)
+#### 4.1.2 配置结构设计
 
-// List returns all registered provider names
-func (r *Registry) List() []string
-```
+**文件：** `pkg/provider/config.go`
 
-#### 4.1.2 Configuration Structure
+**CommonConfig（通用配置）：**
 
-**File:** `pkg/provider/config.go`
+包含所有 Provider 共享的配置字段：
+- `Model` - 模型标识符
+- `Temperature` - 控制随机性（0.0-2.0）
+- `MaxTokens` - 限制响应长度
+- `TopP` - 通过核采样控制多样性
+- `Timeout` - API 请求超时时间
+- `BaseURL` - 允许覆盖默认 API 端点
 
-```go
-package provider
+**ModelConfig（模型配置）：**
 
-import "time"
+创建模型实例的标准配置：
+- `Provider` - 指定使用的 Provider（"openai"、"qianfan"、"ollama"）
+- 包含 CommonConfig
+- `ProviderConfig` - Provider 特定配置（APIKey 等）
 
-// CommonConfig contains shared configuration fields for all providers
-type CommonConfig struct {
-    // Model is the model identifier
-    Model string
-    
-    // Temperature controls randomness (0.0-2.0)
-    Temperature *float32
-    
-    // MaxTokens limits the response length
-    MaxTokens *int
-    
-    // TopP controls diversity via nucleus sampling
-    TopP *float32
-    
-    // Timeout for API requests
-    Timeout time.Duration
-    
-    // BaseURL allows overriding the default API endpoint
-    BaseURL string
-}
+#### 4.1.3 OpenAI Provider 实现
 
-// ModelConfig is the standard configuration for creating a model instance
-type ModelConfig struct {
-    // Provider specifies which provider to use ("openai", "qianfan", "ollama")
-    Provider string
-    
-    // Common fields shared across providers
-    CommonConfig
-    
-    // Provider-specific configuration (APIKey, etc.)
-    // Must be type-asserted by each provider implementation
-    ProviderConfig interface{}
-}
-```
+**文件：** `pkg/provider/openai/provider.go`
 
-#### 4.1.3 OpenAI Provider Implementation
+**职责：**
+- 实现 Provider 接口
+- 封装 eino-ext 的 OpenAI 实现
+- 处理 OpenAI 特定的配置和错误
 
-**File:** `pkg/provider/openai/provider.go`
+**特定配置：**
+- `APIKey` - OpenAI API 密钥（必需）
+- `Organization` - OpenAI 组织 ID（可选）
 
-```go
-package openai
+**模型列表：**
+- GPT-4o（支持 chat、tools、vision）
+- GPT-4o Mini（支持 chat、tools）
+- GPT-4 Turbo（支持 chat、tools、vision）
+- GPT-3.5 Turbo（支持 chat、tools）
 
-import (
-    "context"
-    "fmt"
-    
-    "github.com/cloudwego/eino-ext/components/model/openai"
-    "github.com/cloudwego/eino/components/model"
-    "github.com/cloudwego/eino/schema"
-    
-    piprovider "pi-agent/pkg/provider"
-)
+**实现要点：**
+- 使用 eino-ext/components/model/openai
+- BaseChatModel 已实现 ToolCallingChatModel 接口
+- 支持所有标准 OpenAI 参数
 
-const ProviderName = "openai"
+#### 4.1.4 百度千帆 Provider 实现
 
-type Provider struct{}
+**文件：** `pkg/provider/qianfan/provider.go`
 
-func New() *Provider {
-    return &Provider{}
-}
+**职责：**
+- 实现 Provider 接口
+- 通过 OpenAI 兼容 API 接入千帆
+- 处理千帆特定的配置
 
-func (p *Provider) Name() string {
-    return ProviderName
-}
+**特定配置：**
+- `APIKey` - 百度千帆 API 密钥（必需）
+- `BaseURL` - 千帆 API 端点（默认：https://qianfan.baidubce.com/v2）
 
-type Config struct {
-    piprovider.CommonConfig
-    
-    // APIKey is the OpenAI API key (required)
-    APIKey string
-    
-    // Organization is the OpenAI organization ID (optional)
-    Organization string
-}
+**模型列表：**
+- GLM-5（最大上下文 198K）
+- MiniMax-M2.5（最大上下文 192K）
+- Kimi-K2.5（最大上下文 256K）
 
-func (p *Provider) CreateModel(ctx context.Context, config interface{}) (model.BaseChatModel, error) {
-    cfg, ok := config.(*Config)
-    if !ok {
-        return nil, fmt.Errorf("invalid config type: expected *openai.Config")
-    }
-    
-    if err := p.ValidateConfig(cfg); err != nil {
-        return nil, err
-    }
-    
-    opts := []openai.Option{
-        openai.WithModel(cfg.Model),
-        openai.WithAPIKey(cfg.APIKey),
-    }
-    
-    if cfg.BaseURL != "" {
-        opts = append(opts, openai.WithBaseURL(cfg.BaseURL))
-    }
-    if cfg.Organization != "" {
-        opts = append(opts, openai.WithOrganization(cfg.Organization))
-    }
-    if cfg.Temperature != nil {
-        opts = append(opts, openai.WithTemperature(*cfg.Temperature))
-    }
-    if cfg.MaxTokens != nil {
-        opts = append(opts, openai.WithMaxTokens(*cfg.MaxTokens))
-    }
-    if cfg.TopP != nil {
-        opts = append(opts, openai.WithTopP(*cfg.TopP))
-    }
-    if cfg.Timeout > 0 {
-        opts = append(opts, openai.WithTimeout(cfg.Timeout))
-    }
-    
-    return openai.NewChatModel(ctx, opts...)
-}
+**实现要点：**
+- 千帆 API 与 OpenAI 兼容，复用 eino-ext 的 openai 组件
+- 正确设置 BaseURL
+- 处理千帆特有的错误码
 
-func (p *Provider) CreateToolCallingModel(ctx context.Context, config interface{}) (model.ToolCallingChatModel, error) {
-    // For OpenAI, BaseChatModel implements ToolCallingChatModel
-    m, err := p.CreateModel(ctx, config)
-    if err != nil {
-        return nil, err
-    }
-    
-    // Type assertion is safe for OpenAI as it implements ToolCallingChatModel
-    return m.(model.ToolCallingChatModel), nil
-}
+#### 4.1.5 Ollama Provider 实现
 
-func (p *Provider) ValidateConfig(config interface{}) error {
-    cfg, ok := config.(*Config)
-    if !ok {
-        return fmt.Errorf("invalid config type: expected *openai.Config")
-    }
-    
-    if cfg.APIKey == "" {
-        return fmt.Errorf("APIKey is required")
-    }
-    if cfg.Model == "" {
-        return fmt.Errorf("Model is required")
-    }
-    
-    return nil
-}
+**文件：** `pkg/provider/ollama/provider.go`
 
-func (p *Provider) ListModels(ctx context.Context) ([]piprovider.ModelInfo, error) {
-    // Return common OpenAI models
-    return []piprovider.ModelInfo{
-        {ID: "gpt-4o", Name: "GPT-4o", Provider: ProviderName, MaxTokens: 128000, Capabilities: []string{"chat", "tools", "vision"}},
-        {ID: "gpt-4o-mini", Name: "GPT-4o Mini", Provider: ProviderName, MaxTokens: 128000, Capabilities: []string{"chat", "tools"}},
-        {ID: "gpt-4-turbo", Name: "GPT-4 Turbo", Provider: ProviderName, MaxTokens: 128000, Capabilities: []string{"chat", "tools", "vision"}},
-        {ID: "gpt-3.5-turbo", Name: "GPT-3.5 Turbo", Provider: ProviderName, MaxTokens: 16385, Capabilities: []string{"chat", "tools"}},
-    }, nil
-}
-```
+**职责：**
+- 实现 Provider 接口
+- 连接本地 Ollama 服务
+- 支持本地开源模型
 
-#### 4.1.4 Baidu Qianfan Provider
+**特定配置：**
+- `BaseURL` - Ollama 服务地址（默认：http://localhost:11434）
+- `Model` - 本地模型名称
 
-**File:** `pkg/provider/qianfan/provider.go`
-
-```go
-package qianfan
-
-import (
-    "context"
-    "fmt"
-    
-    "github.com/cloudwego/eino-ext/components/model/openai" // Qianfan is OpenAI-compatible
-    "github.com/cloudwego/eino/components/model"
-    
-    piprovider "pi-agent/pkg/provider"
-)
-
-const ProviderName = "qianfan"
-
-type Provider struct{}
-
-func New() *Provider {
-    return &Provider{}
-}
-
-func (p *Provider) Name() string {
-    return ProviderName
-}
-
-type Config struct {
-    piprovider.CommonConfig
-    
-    // APIKey is the Baidu Qianfan API key (required)
-    APIKey string
-    
-    // BaseURL is the Qianfan API endpoint
-    // Default: https://qianfan.baidubce.com/v2
-    BaseURL string
-}
-
-func (p *Provider) CreateModel(ctx context.Context, config interface{}) (model.BaseChatModel, error) {
-    cfg, ok := config.(*Config)
-    if !ok {
-        return nil, fmt.Errorf("invalid config type: expected *qianfan.Config")
-    }
-    
-    if err := p.ValidateConfig(cfg); err != nil {
-        return nil, err
-    }
-    
-    baseURL := cfg.BaseURL
-    if baseURL == "" {
-        baseURL = "https://qianfan.baidubce.com/v2"
-    }
-    
-    opts := []openai.Option{
-        openai.WithModel(cfg.Model),
-        openai.WithAPIKey(cfg.APIKey),
-        openai.WithBaseURL(baseURL),
-    }
-    
-    if cfg.Temperature != nil {
-        opts = append(opts, openai.WithTemperature(*cfg.Temperature))
-    }
-    if cfg.MaxTokens != nil {
-        opts = append(opts, openai.WithMaxTokens(*cfg.MaxTokens))
-    }
-    
-    return openai.NewChatModel(ctx, opts...)
-}
-
-func (p *Provider) CreateToolCallingModel(ctx context.Context, config interface{}) (model.ToolCallingChatModel, error) {
-    m, err := p.CreateModel(ctx, config)
-    if err != nil {
-        return nil, err
-    }
-    return m.(model.ToolCallingChatModel), nil
-}
-
-func (p *Provider) ValidateConfig(config interface{}) error {
-    cfg, ok := config.(*Config)
-    if !ok {
-        return fmt.Errorf("invalid config type: expected *qianfan.Config")
-    }
-    
-    if cfg.APIKey == "" {
-        return fmt.Errorf("APIKey is required")
-    }
-    if cfg.Model == "" {
-        return fmt.Errorf("Model is required")
-    }
-    
-    return nil
-}
-
-func (p *Provider) ListModels(ctx context.Context) ([]piprovider.ModelInfo, error) {
-    return []piprovider.ModelInfo{
-        {ID: "glm-5", Name: "GLM-5", Provider: ProviderName, MaxTokens: 198000, Capabilities: []string{"chat", "tools"}},
-        {ID: "minimax-m2.5", Name: "MiniMax-M2.5", Provider: ProviderName, MaxTokens: 192000, Capabilities: []string{"chat", "tools"}},
-        {ID: "kimi-k2.5", Name: "Kimi-K2.5", Provider: ProviderName, MaxTokens: 256000, Capabilities: []string{"chat", "tools"}},
-    }, nil
-}
-```
+**实现要点：**
+- Ollama 提供 OpenAI 兼容 API
+- 无需 APIKey
+- 支持模型自动下载
 
 ### 4.2 Message Builder
 
-**File:** `pkg/message/builder.go`
+**文件：** `pkg/message/builder.go`
 
-```go
-package message
+**设计目标：**
 
-import (
-    "github.com/cloudwego/eino/schema"
-)
+提供流畅的接口构建消息序列，基于 eino schema。
 
-// Builder provides a fluent interface for constructing messages
-type Builder struct {
-    messages []*schema.Message
-}
+**Builder 方法：**
 
-// NewBuilder creates a new message builder
-func NewBuilder() *Builder {
-    return &Builder{
-        messages: make([]*schema.Message, 0),
-    }
-}
+- `NewBuilder()` - 创建新的消息构建器
+- `System(content)` - 添加系统消息
+- `User(content)` - 添加用户消息
+- `UserWithImages(content, images)` - 添加带图片的用户消息
+- `Assistant(content)` - 添加助手消息
+- `Tool(toolCallID, content)` - 添加工具结果消息
+- `Build()` - 返回构建的消息列表
 
-// System adds a system message
-func (b *Builder) System(content string) *Builder {
-    b.messages = append(b.messages, &schema.Message{
-        Role:    schema.System,
-        Content: content,
-    })
-    return b
-}
+**ImageContent 结构：**
+- `Data` - 图片数据（base64 解码后的字节）
+- `MimeType` - MIME 类型（如 "image/jpeg"、"image/png"）
 
-// User adds a user message
-func (b *Builder) User(content string) *Builder {
-    b.messages = append(b.messages, &schema.Message{
-        Role:    schema.User,
-        Content: content,
-    })
-    return b
-}
+**使用场景：**
+- 简化消息构建过程
+- 支持链式调用
+- 类型安全的消息构造
 
-// UserWithImages adds a user message with images
-func (b *Builder) UserWithImages(content string, images []ImageContent) *Builder {
-    parts := []schema.ContentPart{
-        &schema.TextContent{Text: content},
-    }
-    for _, img := range images {
-        parts = append(parts, &schema.ImageContent{
-            Data:     img.Data,
-           MimeType: img.MimeType,
-        })
-    }
-    
-    b.messages = append(b.messages, &schema.Message{
-        Role:    schema.User,
-        Content: parts,
-    })
-    return b
-}
+### 4.3 错误处理
 
-// Assistant adds an assistant message
-func (b *Builder) Assistant(content string) *Builder {
-    b.messages = append(b.messages, &schema.Message{
-        Role:    schema.Assistant,
-        Content: content,
-    })
-    return b
-}
+**文件：** `pkg/provider/errors.go`
 
-// Tool adds a tool result message
-func (b *Builder) Tool(toolCallID, content string) *Builder {
-    b.messages = append(b.messages, &schema.Message{
-        Role:       schema.Tool,
-        Content:    content,
-        ToolCallID: toolCallID,
-    })
-    return b
-}
+**Error 结构：**
 
-// Build returns the constructed messages
-func (b *Builder) Build() []*schema.Message {
-    return b.messages
-}
+Provider 特定的错误类型：
+- `Provider` - Provider 名称
+- `Code` - 错误代码
+- `Message` - 错误消息
+- `Cause` - 底层错误（如果有）
 
-// ImageContent represents an image in a message
-type ImageContent struct {
-    Data     []byte // Image data (base64-decoded)
-    MimeType string // "image/jpeg", "image/png", etc.
-}
-```
+**错误代码：**
+- `INVALID_CONFIG` - 配置无效
+- `MISSING_API_KEY` - 缺少 API 密钥
+- `INVALID_MODEL` - 模型无效
+- `REQUEST_FAILED` - 请求失败
+- `RATE_LIMITED` - 被限流
+- `TIMEOUT` - 请求超时
 
-### 4.3 Error Handling
-
-**File:** `pkg/provider/errors.go`
-
-```go
-package provider
-
-import "fmt"
-
-// Error represents a provider-specific error
-type Error struct {
-    Provider string // Provider name
-    Code     string // Error code
-    Message  string // Error message
-    Cause    error  // Underlying error (if any)
-}
-
-func (e *Error) Error() string {
-    if e.Cause != nil {
-        return fmt.Sprintf("[%s] %s: %s (cause: %v)", e.Provider, e.Code, e.Message, e.Cause)
-    }
-    return fmt.Sprintf("[%s] %s: %s", e.Provider, e.Code, e.Message)
-}
-
-func (e *Error) Unwrap() error {
-    return e.Cause
-}
-
-// Common error codes
-const (
-    ErrCodeInvalidConfig = "INVALID_CONFIG"
-    ErrCodeMissingAPIKey = "MISSING_API_KEY"
-    ErrCodeInvalidModel  = "INVALID_MODEL"
-    ErrCodeRequestFailed = "REQUEST_FAILED"
-    ErrCodeRateLimited   = "RATE_LIMITED"
-    ErrCodeTimeout       = "TIMEOUT"
-)
-
-// NewError creates a new provider error
-func NewError(provider, code, message string, cause error) *Error {
-    return &Error{
-        Provider: provider,
-        Code:     code,
-        Message:  message,
-        Cause:    cause,
-    }
-}
-```
+**错误处理原则：**
+- 所有错误都包含 Provider 名称
+- 支持错误链（Unwrap）
+- 清晰的错误消息便于调试
 
 ---
 
-## 5. Data Flow
+## 5. 数据流
 
-### 5.1 Basic Chat Flow
-
-```
-User Code
-    │
-    ▼
-Create Provider Instance (Provider.New())
-    │
-    ▼
-Create Model Instance (Provider.CreateModel())
-    │
-    ▼
-Build Messages (message.Builder)
-    │
-    ▼
-Call Model (BaseChatModel.Generate/Stream)
-    │
-    ▼
-Receive Response (*schema.Message)
-    │
-    ▼
-User Code (process response)
-```
-
-### 5.2 Tool Calling Flow
+### 5.1 基础聊天流程
 
 ```
-User Code
+用户代码
     │
     ▼
-Create Provider Instance
+创建 Provider 实例 (Provider.New())
     │
     ▼
-Create ToolCallingChatModel (Provider.CreateToolCallingModel())
+创建模型实例 (Provider.CreateModel())
     │
     ▼
-Bind Tools (ToolCallingChatModel.WithTools())
+构建消息 (message.Builder)
     │
     ▼
-Build Messages
+调用模型 (BaseChatModel.Generate/Stream)
     │
     ▼
-Call Model
+接收响应 (*schema.Message)
     │
     ▼
-Check Response for ToolCalls
+用户代码（处理响应）
+```
+
+### 5.2 工具调用流程
+
+```
+用户代码
     │
-    ├─ Has ToolCalls?
+    ▼
+创建 Provider 实例
+    │
+    ▼
+创建 ToolCallingChatModel (Provider.CreateToolCallingModel())
+    │
+    ▼
+绑定工具 (ToolCallingChatModel.WithTools())
+    │
+    ▼
+构建消息
+    │
+    ▼
+调用模型
+    │
+    ▼
+检查响应中的 ToolCalls
+    │
+    ├─ 有 ToolCalls？
     │     │
     │     ▼
-    │  Execute Tool
+    │  执行工具
     │     │
     │     ▼
-    │  Add ToolResult Message
+    │  添加 ToolResult 消息
     │     │
-    │     └─> Loop back to "Call Model"
+    │     └─> 循环回到"调用模型"
     │
-    └─ No ToolCalls → Return Final Response
+    └─ 无 ToolCalls → 返回最终响应
 ```
 
 ---
 
-## 6. Testing Strategy
+## 6. 测试策略
 
-### 6.1 Unit Tests
+### 6.1 单元测试
 
-**Provider Tests:**
-- Test configuration validation
-- Test model creation with various configs
-- Test error handling for invalid inputs
+**Provider 测试：**
+- 测试配置验证
+- 测试各种配置下的模型创建
+- 测试无效输入的错误处理
 
-**Message Builder Tests:**
-- Test message construction
-- Test multi-modal content
-- Test edge cases (empty content, etc.)
+**Message Builder 测试：**
+- 测试消息构建
+- 测试多模态内容
+- 测试边界情况（空内容等）
 
-### 6.2 Integration Tests
+### 6.2 集成测试
 
-- Test actual API calls (with mock server or real API keys in CI secrets)
-- Test streaming responses
-- Test tool calling workflow
-- Test multiple providers interchangeably
+- 测试实际 API 调用（使用 mock 服务器或 CI secrets 中的真实 API 密钥）
+- 测试流式响应
+- 测试工具调用工作流
+- 测试多个 Provider 互换使用
 
-### 6.3 Test Coverage Goals
+### 6.3 测试覆盖率目标
 
-- Minimum 80% code coverage
-- All error paths must be tested
-- All public APIs must have examples
-
----
-
-## 7. Dependencies
-
-### 7.1 Core Dependencies
-
-- **go 1.18+**: Language version
-- **github.com/cloudwego/eino**: Core framework (BaseChatModel, Schema, etc.)
-- **github.com/cloudwego/eino-ext**: Provider implementations
-
-### 7.2 Development Dependencies
-
-- **golangci-lint**: Linting and code quality
-- **mockgen**: Mock generation for testing
-- **gotestsum**: Improved test output
+- 最低 80% 代码覆盖率
+- 所有错误路径必须测试
+- 所有公共 API 必须有示例
 
 ---
 
-## 8. Migration Path
+## 7. 依赖关系
 
-### Phase 1 (Current)
-- Provider abstraction
-- OpenAI, Qianfan, Ollama support
+### 7.1 核心依赖
+
+- **go 1.18+**：语言版本
+- **github.com/cloudwego/eino**：核心框架（BaseChatModel、Schema 等）
+- **github.com/cloudwego/eino-ext**：Provider 实现
+
+### 7.2 开发依赖
+
+- **golangci-lint**：代码检查和质量
+- **mockgen**：测试用的 Mock 生成
+- **gotestsum**：改进测试输出
+
+---
+
+## 8. 演进路线
+
+### 第一阶段（当前）
+- Provider 抽象
+- OpenAI、Qianfan、Ollama 支持
 - Message builder
-- Basic tool calling
+- 基础工具调用
 
-### Phase 2
-- Agent core with state management
-- Tool registry
-- Advanced conversation management
-- Session persistence
+### 第二阶段
+- Agent 核心与状态管理
+- 工具注册中心
+- 高级对话管理
+- 会话持久化
 
-### Phase 3
-- Skills system
-- Multi-agent coordination
-- Advanced workflow composition
-- UI components
-
----
-
-## 9. Success Criteria
-
-### Phase 1 Success Metrics
-
-1. **Functionality**
-   - ✅ Successfully call OpenAI API
-   - ✅ Successfully call Qianfan API
-   - ✅ Successfully call Ollama API
-   - ✅ Streaming responses work correctly
-   - ✅ Tool calling works correctly
-
-2. **Code Quality**
-   - ✅ All packages have < 500 lines per file
-   - ✅ Clear separation of concerns
-   - ✅ No circular dependencies
-   - ✅ 80%+ test coverage
-
-3. **Documentation**
-   - ✅ README with quickstart
-   - ✅ Working code examples
-   - ✅ Provider development guide
-
-4. **Developer Experience**
-   - ✅ Easy to add new provider (< 30 minutes)
-   - ✅ Clear error messages
-   - ✅ Intuitive API
+### 第三阶段
+- Skills 系统
+- 多 Agent 协调
+- 高级工作流组合
+- UI 组件
 
 ---
 
-## 10. Open Questions
+## 9. 成功标准
 
-1. **Configuration Management**
-   - Should we support environment variable-based configuration?
-   - How to handle API key rotation?
+### 第一阶段成功指标
 
-2. **Error Recovery**
-   - Should providers implement automatic retry logic?
-   - How to handle rate limiting gracefully?
+1. **功能性**
+   - ✅ 成功调用 OpenAI API
+   - ✅ 成功调用百度千帆 API
+   - ✅ 成功调用 Ollama API
+   - ✅ 流式响应正常工作
+   - ✅ 工具调用正常工作
 
-3. **Performance**
-   - Should we implement connection pooling?
-   - How to handle concurrent requests efficiently?
+2. **代码质量**
+   - ✅ 所有包的文件行数 < 500 行
+   - ✅ 清晰的关注点分离
+   - ✅ 无循环依赖
+   - ✅ 80%+ 测试覆盖率
 
-4. **Observability**
-   - Should we add logging middleware?
-   - How to track API usage and costs?
+3. **文档**
+   - ✅ README 包含快速开始
+   - ✅ 可运行的代码示例
+   - ✅ Provider 开发指南
+
+4. **开发者体验**
+   - ✅ 添加新 Provider 容易（< 30 分钟）
+   - ✅ 清晰的错误消息
+   - ✅ 直观的 API
 
 ---
 
-## 11. Timeline Estimate
+## 10. 开放问题
 
-### Phase 1: LLM Integration (2-3 weeks)
+1. **配置管理**
+   - 是否应该支持基于环境变量的配置？
+   - 如何处理 API 密钥轮换？
 
-**Week 1:**
-- Provider interface design
-- OpenAI provider implementation
+2. **错误恢复**
+   - Provider 是否应该实现自动重试逻辑？
+   - 如何优雅地处理限流？
+
+3. **性能**
+   - 是否应该实现连接池？
+   - 如何高效处理并发请求？
+
+4. **可观测性**
+   - 是否应该添加日志中间件？
+   - 如何追踪 API 使用和成本？
+
+---
+
+## 11. 时间估算
+
+### 第一阶段：LLM 集成（2-3 周）
+
+**第一周：**
+- Provider 接口设计
+- OpenAI Provider 实现
 - Message builder
-- Basic tests
+- 基础测试
 
-**Week 2:**
-- Qianfan provider implementation
-- Ollama provider implementation
-- Error handling
-- Integration tests
+**第二周：**
+- Qianfan Provider 实现
+- Ollama Provider 实现
+- 错误处理
+- 集成测试
 
-**Week 3:**
-- Documentation
-- Examples
-- Code review and refinement
-- Release preparation
-
----
-
-## 12. Risks and Mitigations
-
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| API changes in eino | High | Low | Pin version, monitor upstream changes |
-| Provider API incompatibilities | Medium | Medium | Extensive integration testing |
-| Performance issues with streaming | Medium | Low | Benchmark early, optimize if needed |
-| Configuration complexity | Low | Medium | Keep config minimal, use sensible defaults |
+**第三周：**
+- 文档编写
+- 示例代码
+- 代码审查和优化
+- 发布准备
 
 ---
 
-## 13. Appendix
+## 12. 风险与缓解措施
 
-### A. Example Usage
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-    "log"
-    
-    "pi-agent/pkg/message"
-    "pi-agent/pkg/provider"
-    "pi-agent/pkg/provider/openai"
-)
-
-func main() {
-    // Create provider registry
-    registry := provider.NewRegistry()
-    
-    // Register providers
-    registry.Register(openai.New())
-    
-    // Get OpenAI provider
-    p, err := registry.Get("openai")
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    // Create model
-    model, err := p.CreateModel(context.Background(), &openai.Config{
-        APIKey: "sk-...",
-        Model:  "gpt-4o",
-    })
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    // Build messages
-    msgs := message.NewBuilder().
-        System("You are a helpful assistant.").
-        User("Hello!").
-        Build()
-    
-    // Generate response
-    response, err := model.Generate(context.Background(), msgs)
-    if err != nil {
-        log.Fatal(err)
-    }
-    
-    fmt.Println(response.Content)
-}
-```
-
-### B. Tool Calling Example
-
-```go
-// Create tool-calling model
-toolModel, err := p.CreateToolCallingModel(ctx, &openai.Config{
-    APIKey: "sk-...",
-    Model:  "gpt-4o",
-})
-
-// Define tools
-weatherTool := &schema.ToolInfo{
-    Name: "get_weather",
-    Desc: "Get current weather for a location",
-    ParamsOneOf: schema.NewParamsOneOfByParams(map[string]any{
-        "location": map[string]any{
-            "type": "string",
-            "description": "City name",
-        },
-    }),
-}
-
-// Bind tool
-toolModel, err = toolModel.WithTools([]*schema.ToolInfo{weatherTool})
-if err != nil {
-    log.Fatal(err)
-}
-
-// Use the model...
-```
+| 风险 | 影响 | 概率 | 缓解措施 |
+|------|------|------|----------|
+| eino API 变更 | 高 | 低 | 固定版本，监控上游变更 |
+| Provider API 不兼容 | 中 | 中 | 详细的集成测试 |
+| 流式响应性能问题 | 中 | 低 | 早期基准测试，按需优化 |
+| 配置复杂度 | 低 | 中 | 保持配置最小化，使用合理默认值 |
 
 ---
 
-**End of PRD**
+## 13. 设计决策记录
+
+### 决策 1：使用 BaseChatModel 而非废弃的 ChatModel
+
+**背景：** eino 的 ChatModel 接口已废弃，原因是 BindTools() 方法会修改实例本身，在并发环境下不安全。
+
+**决策：** 使用新的 BaseChatModel 和 ToolCallingChatModel 接口。
+
+**理由：**
+- 避免并发安全问题
+- WithTools() 返回新实例，不可变设计
+- 符合函数式编程原则
+
+### 决策 2：Provider 接口分离创建方法
+
+**背景：** 是否应该统一 CreateModel 和 CreateToolCallingModel？
+
+**决策：** 保持两个独立的创建方法。
+
+**理由：**
+- 不是所有 Provider 都支持工具调用
+- 类型安全，避免运行时类型断言
+- 调用者明确知道得到什么类型的模型
+
+### 决策 3：配置使用 interface{} 而非泛型
+
+**背景：** Go 1.18+ 支持泛型，是否应该使用泛型来类型化配置？
+
+**决策：** 使用 interface{} 配合 ValidateConfig。
+
+**理由：**
+- 更简单的接口定义
+- Registry 可以统一管理所有 Provider
+- Provider 内部进行类型断言和验证
+- 兼容 Go 1.18 之前的惯例
+
+### 决策 4：Message Builder 基于 eino schema
+
+**背景：** 是否应该自定义消息结构？
+
+**决策：** 直接使用 eino 的 schema.Message。
+
+**理由：**
+- 避免重复造轮子
+- 与 eino 生态系统无缝集成
+- schema.Message 已经很完善（支持多模态、工具调用等）
+
+---
+
+## 14. 附录
+
+### A. 使用场景示例
+
+**场景 1：基础聊天**
+- 用户创建 OpenAI Provider
+- 配置 API 密钥和模型
+- 构建系统消息和用户消息
+- 调用 Generate 获取响应
+
+**场景 2：流式对话**
+- 用户创建 Qianfan Provider
+- 使用流式响应实时显示助手回复
+- 支持中途取消
+
+**场景 3：工具调用**
+- 用户创建 Ollama Provider
+- 定义天气查询工具
+- 绑定工具到模型
+- 模型自动决定何时调用工具
+- 执行工具并返回结果
+
+**场景 4：多模型切换**
+- 注册多个 Provider 到 Registry
+- 根据任务需求选择不同模型
+- 统一的错误处理和日志
+
+### B. Provider 开发者指南大纲
+
+1. 实现 Provider 接口
+2. 定义 Provider 特定配置结构
+3. 实现 CreateModel 和 CreateToolCallingModel
+4. 处理 Provider 特定错误
+5. 编写单元测试和集成测试
+6. 提供模型列表和元数据
+7. 编写文档和示例
+
+### C. 错误处理最佳实践
+
+- 所有错误都使用 Error 结构
+- 包含足够的上下文信息
+- 支持错误链追踪
+- 提供可操作的错误消息
+- 区分用户错误和系统错误
+
+---
+
+**文档结束**
